@@ -12,6 +12,8 @@ public class CardControllerScript : MonoBehaviour
     public CardMovementScript movement;
     public CardAbility ability;
 
+    //public AudioSource cardAttackAudio, cardDieAudio;
+
     GameManagerScript gameManager;
 
     public void Init(Card card, bool isPlayerCard)
@@ -52,6 +54,7 @@ public class CardControllerScript : MonoBehaviour
         }
 
         thisCard.isPlaced = true;
+        info.cardCastAudio.Play();
 
         if(thisCard.hasAbility)
             ability.OnCast();
@@ -69,6 +72,7 @@ public class CardControllerScript : MonoBehaviour
 
     public void OnDamageDeal()//нанесение урона
     {
+        info.cardAttackAudio.Play();
         thisCard.timesDealeDamage++;
         thisCard.canAttack = false;
         info.HighlightCard(false);
@@ -80,7 +84,8 @@ public class CardControllerScript : MonoBehaviour
     public void UseSpell(CardControllerScript target)
     {
         var spellCard = (SpellCard)thisCard;
-
+        info.cardCastAudio.Play();
+        
         switch(spellCard.spell)
         {
             case SpellCard.SpellType.ADD_PROVOCATION: //добавление провокиции
@@ -171,7 +176,15 @@ public class CardControllerScript : MonoBehaviour
         if(thisCard.isAlive)
             info.RefreshData();
         else
-            DestroyCard();
+            StartCoroutine(DieCard());     
+    }
+
+    IEnumerator DieCard() // карутина хода
+    {
+        info.cardDieAudio.Play();
+        yield return new WaitForSeconds(0.5f);
+        DestroyCard();
+        StartCoroutine(DieCard());
     }
 
     public void DestroyCard()

@@ -54,6 +54,12 @@ public class GameManagerScript : MonoBehaviour
 
     public AI enemyAI; 
 
+    public Button addEnemyCadrBtn, addPlayerCadrBtn;
+    public AudioSource audioClickAddCard;
+    public Animation addEnemyCardClickAnim, addPlayerCardClickAnim;
+
+    public AudioSource clickButton;
+
     public List<CardControllerScript> playerHandCards = new List<CardControllerScript>(),
                                 playerFieldCards = new List<CardControllerScript>(),
                                 enemyHandCards = new List<CardControllerScript>(),
@@ -174,6 +180,7 @@ public class GameManagerScript : MonoBehaviour
         StopAllCoroutines();
         turn++;
         endTurnBtn.interactable = isPlayerTurn;
+        clickButton.Play();
 
         if(isPlayerTurn)
         {
@@ -195,16 +202,34 @@ public class GameManagerScript : MonoBehaviour
         StartCoroutine(TurnFunk());
     }
 
-    /*void GiveNewCards()
+    public void GiveNewCardForPlayer()
     {
-        
-        
-    }*/
+        addPlayerCardClickAnim.Play();
+        audioClickAddCard.Play();
+        if(playerHandCards.Count < 5/*макс. кол-во карт в руке*/ && playerEnergy >= 100 && isPlayerTurn)
+        {
+                GiveCardToHand(currentGame.playerDeck, playerHand);
+                ReduceEnergy(true, 100);
+                ShowEnergy();
+        }
+    }
+
+    public void GiveNewCardForEnemy()
+    {
+        addEnemyCardClickAnim.Play();
+        audioClickAddCard.Play();
+        if(enemyHandCards.Count < 5/*макс. кол-во карт в руке*/ && enemyEnergy >= 100 && !isPlayerTurn)
+        {
+                GiveCardToHand(currentGame.enemyDeck, enemyHand);
+                ReduceEnergy(false, 100);
+                ShowEnergy();
+        }
+    }
 
     public void CardsFight(CardControllerScript attacker, CardControllerScript defender)
     {
         attacker.OnDamageDeal();
-          
+        
         defender.OnTakeDamage();
         attacker.OnTakeDamage();
         defender.thisCard.GetDamage(attacker.thisCard.attack);
@@ -245,6 +270,7 @@ public class GameManagerScript : MonoBehaviour
             playerHP = Mathf.Clamp(playerHP - card.thisCard.attack, 0, int.MaxValue);
         
         ShowHP();
+
         card.OnDamageDeal();
         CheckForResult();
     }

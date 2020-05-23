@@ -12,6 +12,7 @@ public class CardInfoScript : MonoBehaviour
     public Text name, attack, helth;
     public TextMeshProUGUI cost;
     public GameObject hideObj, highlitedObj;
+    public AudioSource cardAttackAudio, cardDieAudio, cardCastAudio;
     //public bool IsPlayer;
 
     public void HideCardInfo(/*Card card*/) //скрытие руки соперника
