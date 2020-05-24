@@ -9,7 +9,7 @@ public class CardInfoScript : MonoBehaviour
     public CardControllerScript cardController;
     //public Card SelfCard;
     public Image logo;
-    public Text name, attack, helth;
+    public Text name, attack, helth, element, description;
     public TextMeshProUGUI cost;
     public GameObject hideObj, highlitedObj;
     public AudioSource cardAttackAudio, cardDieAudio, cardCastAudio;
@@ -34,6 +34,8 @@ public class CardInfoScript : MonoBehaviour
         this.logo.sprite = cardController.thisCard.logo;
         logo.preserveAspect = true;
         name.text = cardController.thisCard.name;
+        element.text = cardController.thisCard.element;
+        description.text = cardController.thisCard.description;
 
         if(cardController.thisCard.isSpell)
         {
