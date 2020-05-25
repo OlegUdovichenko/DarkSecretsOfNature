@@ -41,6 +41,7 @@ public class GameManagerScript : MonoBehaviour
     int turn, turnTime = 25;
     public Text turnTimeText;
     public Button endTurnBtn;
+    public Slider turnTimeSlider;
 
     public int playerEnergy, enemyEnergy;
     public Text selfEnergyTxt, enemyEnergyTxt;
@@ -51,6 +52,8 @@ public class GameManagerScript : MonoBehaviour
     public GameObject endBg, vinGO, loseGO;
 
     public AttackedHeroScript enemyHero, playerHero;
+
+    public Text playerDeckCardCountTxt, enemyDeckCardCountTxt;
 
     public AI enemyAI; 
 
@@ -112,8 +115,14 @@ public class GameManagerScript : MonoBehaviour
         CreateCardPref(deck[0], hand);
 
         deck.RemoveAt(0);
+        ShowDeckCard();
     }
 
+    void ShowDeckCard()
+    {
+        playerDeckCardCountTxt.text = currentGame.playerDeck.Count.ToString();
+        enemyDeckCardCountTxt.text = currentGame.enemyDeck.Count.ToString();
+    }
 
     void CreateCardPref(Card card, Transform hand)//создание префаба карты
     {
@@ -150,7 +159,14 @@ public class GameManagerScript : MonoBehaviour
             while(turnTime-- > 0)
             {
                 turnTimeText.text = turnTime.ToString();
-                yield return new WaitForSeconds(1);
+                int i = 1;
+                while(i++ < 21)
+                {
+                    turnTimeSlider.value = 25 - (turnTime - i/20f);
+                    yield return new WaitForSeconds(0.05f);
+                }
+                
+                
             }
             ChangeTurn();
         }
@@ -167,7 +183,13 @@ public class GameManagerScript : MonoBehaviour
             while(turnTime --> 0)
             {
                 turnTimeText.text = turnTime.ToString();
-                yield return new WaitForSeconds(1);
+                turnTimeSlider.value = 25 - turnTime;
+                int i = 1;
+                while(i++ < 21)
+                {
+                    turnTimeSlider.value = 25 - (turnTime - i/20f);
+                    yield return new WaitForSeconds(0.05f);
+                }
             }
             ChangeTurn();
         }
@@ -211,6 +233,7 @@ public class GameManagerScript : MonoBehaviour
                 GiveCardToHand(currentGame.playerDeck, playerHand);
                 ReduceEnergy(true, 100);
                 ShowEnergy();
+                CheckCardsForManaAvailability();
         }
     }
 
