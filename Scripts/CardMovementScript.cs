@@ -128,6 +128,7 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
         Transform parent = transform.parent;
         int index = transform.GetSiblingIndex();
 
+
         transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = false;
 
         transform.SetParent(GameObject.Find("Canvas").transform);
@@ -142,6 +143,7 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         transform.SetParent(parent);
         transform.SetSiblingIndex(index);
+        
         transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = true;
     }
 }

@@ -29,6 +29,44 @@ public class CardAbility : MonoBehaviour
                     provocation.SetActive(true);
                 break;
 
+                case Card.AbilityType.STRENGTH_GAIN_CARDS: //увеличение атаки всех своих карт
+                    var allyCards = cardController.isPlayerCard ? 
+                                    GameManagerScript.instance.playerFieldCards : 
+                                    GameManagerScript.instance.enemyFieldCards;
+
+                    foreach(var card in allyCards)
+                    {
+                        card.thisCard.attack += 2000;
+                        card.info.RefreshData();
+                    } 
+                break;
+
+                case Card.AbilityType.DAMAGE_CARDS: //нанесение урона всем вражеским картам
+                    var allCards = cardController.isPlayerCard ? 
+                                    GameManagerScript.instance.enemyFieldCards : 
+                                    GameManagerScript.instance.playerFieldCards;
+
+                    foreach(var card in allCards)
+                    {
+                        card.thisCard.GetDamage(2000);
+                        //card.thisCard.health -= 2000;
+                        card.info.RefreshData();
+                        card.CheckForAlive();
+                    } 
+                break;
+
+                case Card.AbilityType.DESTROY_CARDS: //Уничтожает все карты соперника
+                    var allEnemyCards = cardController.isPlayerCard ? 
+                                    GameManagerScript.instance.enemyFieldCards : 
+                                    GameManagerScript.instance.playerFieldCards;
+
+                    foreach(var card in allEnemyCards)
+                    {
+                        card.thisCard.health = 0;
+                        card.info.RefreshData();
+                        card.CheckForAlive();
+                    } 
+                break;
             }
 
         }
@@ -79,7 +117,7 @@ public class CardAbility : MonoBehaviour
             switch(ability)
             {
                 case Card.AbilityType.REGENERATION:
-                    cardController.thisCard.helth += 2000;
+                    cardController.thisCard.health += 2000;
                     cardController.info.RefreshData();
                 break;
 

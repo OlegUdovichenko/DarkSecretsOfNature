@@ -9,7 +9,7 @@ public class CardInfoScript : MonoBehaviour
     public CardControllerScript cardController;
     //public Card SelfCard;
     public Image logo;
-    public Text name, attack, helth, element, description;
+    public Text name, attack, health, element, description;
     public TextMeshProUGUI cost;
     public GameObject hideObj, highlitedObj;
     public AudioSource cardAttackAudio, cardDieAudio, cardCastAudio;
@@ -19,7 +19,7 @@ public class CardInfoScript : MonoBehaviour
     {
         //SelfCard = card;
         hideObj.SetActive(true);
-        helth.text = "";
+        health.text = "";
         attack.text = "";
         cost.text = "";
         //IsPlayer = false;
@@ -40,7 +40,7 @@ public class CardInfoScript : MonoBehaviour
         if(cardController.thisCard.isSpell)
         {
             attack.gameObject.SetActive(false);
-            helth.gameObject.SetActive(false);
+            health.gameObject.SetActive(false);
         }
 
         RefreshData();
@@ -49,7 +49,7 @@ public class CardInfoScript : MonoBehaviour
     public void RefreshData()
     {
         attack.text = cardController.thisCard.attack.ToString();
-        helth.text = cardController.thisCard.helth.ToString();
+        health.text = cardController.thisCard.health.ToString();
         cost.text = cardController.thisCard.cost.ToString();
     }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using UnityEngine.SceneManagement;
 
 public class Game
 {
@@ -11,22 +11,30 @@ public class Game
 
     public Game()
     {
-        enemyDeck = GiveDeckCard();
-        playerDeck = GiveDeckCard();
+        enemyDeck = GiveDeckCard(CardManager.allEnemyDeckCards);
+        playerDeck = GiveDeckCard(CardManager.allPlayerDeckCards);
     }
 
-    List<Card> GiveDeckCard()
+    List<Card> GiveDeckCard(List<Card> deck)
     {
         List<Card> list = new List<Card>();
-        for(int i = 0; i < 15/*карты в колоде*/; i++)
-        {
-            var card = CardManager.allCards[Random.Range(0, CardManager.allCards.Count)];
 
+        foreach(var card in deck) //заролнение колоды картами
+        {
             if(card.isSpell)
                 list.Add(((SpellCard)card).GetCopy());
             else
                 list.Add(card.GetCopy());
         }
+
+        for (int i = list.Count - 1; i > 0; i--) //тасовка карт
+        {
+            int j = Random.Range(0, i);
+            Card temp = list[j];
+            list[j] = list[i];
+            list[i] = temp;
+        }
+
         return list;
     }
 }
@@ -48,8 +56,6 @@ public class GameManagerScript : MonoBehaviour
 
     public int playerHP, enemyHP;
     public Text playerHPTxt, enemyHPTxt;
-
-    public GameObject endBg, vinGO, loseGO;
 
     public AttackedHeroScript enemyHero, playerHero;
 
@@ -93,9 +99,7 @@ public class GameManagerScript : MonoBehaviour
         ShowEnergy();
         ShowHP();
 
-        endBg.SetActive(false);
-        vinGO.SetActive(false);
-        loseGO.SetActive(false);
+        addEnemyCadrBtn.interactable = false;
         
         StartCoroutine(TurnFunk());
     }
@@ -113,7 +117,6 @@ public class GameManagerScript : MonoBehaviour
             return;
         
         CreateCardPref(deck[0], hand);
-
         deck.RemoveAt(0);
         ShowDeckCard();
     }
@@ -160,10 +163,10 @@ public class GameManagerScript : MonoBehaviour
             {
                 turnTimeText.text = turnTime.ToString();
                 int i = 1;
-                while(i++ < 21)
+                while(i++ < 51)
                 {
-                    turnTimeSlider.value = 25 - (turnTime - i/20f);
-                    yield return new WaitForSeconds(0.05f);
+                    turnTimeSlider.value = 25 - (turnTime - i/50f);
+                    yield return new WaitForSeconds(0.02f);
                 }
                 
                 
@@ -185,10 +188,10 @@ public class GameManagerScript : MonoBehaviour
                 turnTimeText.text = turnTime.ToString();
                 turnTimeSlider.value = 25 - turnTime;
                 int i = 1;
-                while(i++ < 21)
+                while(i++ < 51)
                 {
-                    turnTimeSlider.value = 25 - (turnTime - i/20f);
-                    yield return new WaitForSeconds(0.05f);
+                    turnTimeSlider.value = 25 - (turnTime - i/50f);
+                    yield return new WaitForSeconds(0.02f);
                 }
             }
             ChangeTurn();
@@ -228,10 +231,10 @@ public class GameManagerScript : MonoBehaviour
     {
         addPlayerCardClickAnim.Play();
         audioClickAddCard.Play();
-        if(playerHandCards.Count < 5/*макс. кол-во карт в руке*/ && playerEnergy >= 100 && isPlayerTurn)
+        if(playerHandCards.Count < 5/*макс. кол-во карт в руке*/ && playerEnergy >= 50 && isPlayerTurn)
         {
                 GiveCardToHand(currentGame.playerDeck, playerHand);
-                ReduceEnergy(true, 100);
+                ReduceEnergy(true, 50);
                 ShowEnergy();
                 CheckCardsForManaAvailability();
         }
@@ -241,10 +244,10 @@ public class GameManagerScript : MonoBehaviour
     {
         addEnemyCardClickAnim.Play();
         audioClickAddCard.Play();
-        if(enemyHandCards.Count < 5/*макс. кол-во карт в руке*/ && enemyEnergy >= 100 && !isPlayerTurn)
+        if(enemyHandCards.Count < 5/*макс. кол-во карт в руке*/ && enemyEnergy >= 50 && !isPlayerTurn)
         {
                 GiveCardToHand(currentGame.enemyDeck, enemyHand);
-                ReduceEnergy(false, 100);
+                ReduceEnergy(false, 50);
                 ShowEnergy();
         }
     }
@@ -288,9 +291,9 @@ public class GameManagerScript : MonoBehaviour
     public void DamageHero(CardControllerScript card, bool isEnemyAttacked)
     {
         if(isEnemyAttacked)
-            enemyHP = Mathf.Clamp(enemyHP - card.thisCard.attack, 0, int.MaxValue);
+            enemyHP -= card.thisCard.attack;
         else
-            playerHP = Mathf.Clamp(playerHP - card.thisCard.attack, 0, int.MaxValue);
+            playerHP -= card.thisCard.attack;
         
         ShowHP();
 
@@ -302,16 +305,15 @@ public class GameManagerScript : MonoBehaviour
     {
         if(enemyHP <= 0)
         {
-            vinGO.SetActive(true);
-            endBg.SetActive(true);
-            
             StopAllCoroutines();
+            StaticCollection.endGame = "Victory";
+            SceneManager.LoadScene("EndGame");
         }
         else if(playerHP <= 0)
         {
-            endBg.SetActive(true);
-            loseGO.SetActive(true);
             StopAllCoroutines();
+            StaticCollection.endGame = "Defeat";
+            SceneManager.LoadScene("EndGame");
         }
     }
 

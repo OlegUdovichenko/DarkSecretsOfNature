@@ -18,7 +18,7 @@ public class AI : MonoBehaviour
 
         for(int i = 0; i < count; i++) //выставление карт соперником для проверки
         {
-            if (gameManager.enemyFieldCards.Count > 4/*баг с выкладыванием бльшего кол-ва карт*/ || GameManagerScript.instance.enemyEnergy == 0
+            if (gameManager.enemyFieldCards.Count > 4 || GameManagerScript.instance.enemyEnergy == 0
                 || gameManager.enemyHandCards.Count == 0)
                 break;
 
@@ -27,13 +27,14 @@ public class AI : MonoBehaviour
             if(cardsList.Count == 0)
                 break;
 
-            cardsList[0].GetComponent<CardMovementScript>().MoveToField(gameManager.enemyField);
 
+            cardsList[0].GetComponent<CardMovementScript>().MoveToField(gameManager.enemyField);
             yield  return new WaitForSeconds(0.51f);
 
             cardsList[0].transform.SetParent(gameManager.enemyField);
 
             cardsList[0].OnCast();
+            
         }
 
         yield  return new WaitForSeconds(1);
@@ -57,7 +58,7 @@ public class AI : MonoBehaviour
                 activeCard.thisCard.canAttack = false;
 
                 activeCard.movement.MoveToTurget(enemy.transform);
-                yield return new WaitForSeconds(.75f);
+                yield return new WaitForSeconds(.2f);
 
                 gameManager.CardsFight(enemy, activeCard);
             }
@@ -66,96 +67,14 @@ public class AI : MonoBehaviour
                 activeCard.thisCard.canAttack = false;
 
                 activeCard.GetComponent<CardMovementScript>().MoveToTurget(gameManager.playerHero.transform);
-                yield return new WaitForSeconds(.75f);
+                yield return new WaitForSeconds(.2f);
 
                 gameManager.DamageHero(activeCard, false);
             }
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(1);
         }
         yield return new WaitForSeconds(1);
         gameManager.ChangeTurn();
     }
-
-
-
-
-
-    /*void CastSpell(CardController card)
-    {
-        switch (((SpellCard)card.Card).SpellTarget)
-        {
-            case SpellCard.TargetType.NO_TARGET:
-
-                switch (((SpellCard)card.Card).Spell)
-                {
-                    case SpellCard.SpellType.HEAL_ALLY_FIELD_CARDS:
-
-                        if (GameManagerScr.Instance.EnemyFieldCards.Count > 0)
-                            StartCoroutine(CastCard(card));
-
-                        break;
-
-                    case SpellCard.SpellType.DAMAGE_ENEMY_FIELD_CARDS:
-
-                        if (GameManagerScr.Instance.PlayerFieldCards.Count > 0)
-                            StartCoroutine(CastCard(card));
-
-                        break;
-
-                    case SpellCard.SpellType.HEAL_ALLY_HERO:
-                        StartCoroutine(CastCard(card));
-                        break;
-
-                    case SpellCard.SpellType.DAMAGE_ENEMY_HERO:
-                        StartCoroutine(CastCard(card));
-                        break;
-                }
-
-                break;
-
-            case SpellCard.TargetType.ALLY_CARD_TARGET:
-
-                if (GameManagerScr.Instance.EnemyFieldCards.Count > 0)
-                    StartCoroutine(CastCard(card,
-                        GameManagerScr.Instance.EnemyFieldCards[Random.Range(0, GameManagerScr.Instance.EnemyFieldCards.Count)]));
-
-                break;
-
-            case SpellCard.TargetType.ENEMY_CARD_TARGET:
-
-                if (GameManagerScr.Instance.PlayerFieldCards.Count > 0)
-                    StartCoroutine(CastCard(card,
-                        GameManagerScr.Instance.PlayerFieldCards[Random.Range(0, GameManagerScr.Instance.PlayerFieldCards.Count)]));
-
-                break;
-        }
-    }
-
-    IEnumerator CastCard(CardController spell, CardController target = null)
-    {
-        if (((SpellCard)spell.Card).SpellTarget == SpellCard.TargetType.NO_TARGET)
-        {
-            spell.GetComponent<CardMovementScr>().MoveToField(GameManagerScr.Instance.EnemyField);
-            yield return new WaitForSeconds(.51f);
-
-            spell.OnCast();
-        }
-        else
-        {
-            spell.Info.ShowCardInfo();
-            spell.GetComponent<CardMovementScr>().MoveToTarget(target.transform);
-            yield return new WaitForSeconds(.51f);
-
-            GameManagerScr.Instance.EnemyHandCards.Remove(spell);
-            GameManagerScr.Instance.EnemyFieldCards.Add(spell);
-            GameManagerScr.Instance.ReduceMana(false, spell.Card.Manacost);
-
-            spell.Card.IsPlaced = true;
-
-            spell.UseSpell(target);
-        }
-
-        string targetStr = target == null ? "no_target" : target.Card.Name;
-        Debug.Log("AI spell cast: " + (spell.Card).Name + " target: " + targetStr);
-    }*/
+   
 }

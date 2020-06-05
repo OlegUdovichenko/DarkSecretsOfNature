@@ -12,8 +12,6 @@ public class CardControllerScript : MonoBehaviour
     public CardMovementScript movement;
     public CardAbility ability;
 
-    //public AudioSource cardAttackAudio, cardDieAudio;
-
     GameManagerScript gameManager;
 
     public void Init(Card card, bool isPlayerCard)
@@ -96,6 +94,11 @@ public class CardControllerScript : MonoBehaviour
                 }
             break;
 
+            case SpellCard.SpellType.ADD_DOUBLE_ATTACK: //добавление способности повторной атаки
+                target.thisCard.abilities.Add(Card.AbilityType.DOUBLE_ATTACK);
+                target.info.HighlightCard(true);
+            break;
+
 
             case SpellCard.SpellType.DAMAGE_CARD: //урон одной карте
                 GiveDamageTo(target, spellCard.spellValue);
@@ -124,12 +127,13 @@ public class CardControllerScript : MonoBehaviour
 
 
             case SpellCard.SpellType.DESTROY_CARD: //уничтожение карты
-                GiveDamageTo(target, target.thisCard.helth);
+                target.thisCard.health = 0;
+                target.CheckForAlive();
             break;
 
 
             case SpellCard.SpellType.HEAL_CARD: //хилл одной карты
-                target.thisCard.helth += spellCard.spellValue;
+                target.thisCard.health += spellCard.spellValue;
             break;
 
 
@@ -140,7 +144,7 @@ public class CardControllerScript : MonoBehaviour
 
                 foreach(var card in allyCards)
                 {
-                    card.thisCard.helth += spellCard.spellValue;
+                    card.thisCard.health += spellCard.spellValue;
                     card.info.RefreshData();
                 } 
             break;
@@ -154,6 +158,22 @@ public class CardControllerScript : MonoBehaviour
                 
                 gameManager.ShowHP();
             break;
+
+                                    
+            case SpellCard.SpellType.DESTROY_ALL_CARDS: //уничтожение ВСЕХ карт
+                foreach(var card in gameManager.playerFieldCards)
+                {
+                    card.thisCard.health = 0;
+                    card.info.RefreshData();
+                    card.CheckForAlive();
+                } 
+                foreach(var card in gameManager.enemyFieldCards)
+                {
+                    card.thisCard.health = 0;
+                    card.info.RefreshData();
+                    card.CheckForAlive();
+                } 
+            break;
         }
 
         if(target != null)
@@ -161,6 +181,7 @@ public class CardControllerScript : MonoBehaviour
             target.ability.OnCast();
             target.CheckForAlive();
         }
+        
         DestroyCard();
     }
 
@@ -179,7 +200,7 @@ public class CardControllerScript : MonoBehaviour
             StartCoroutine(DieCard());     
     }
 
-    IEnumerator DieCard() // карутина хода
+    IEnumerator DieCard()
     {
         info.cardDieAudio.Play();
         yield return new WaitForSeconds(0.5f);
